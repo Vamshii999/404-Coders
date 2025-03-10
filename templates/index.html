@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>AI Study Planner</title>
+  <style>
+    body {
+      font-family: 'Times New Roman', serif; /* Large, serif font */
+      font-size: 20px;
+      background-image: url('background.jpg'); /* Add background image */
+      background-size: cover; /* Cover the entire viewport */
+      background-repeat: no-repeat; /* Prevent image repeating */
+      background: linear-gradient(to right, #e0ffff, #f0fff0); /* Light blue to light green gradient */
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      background-color: #fff;
+      border-radius: 15px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+      width: 90%;
+      max-width: 800px;
+      text-align: center;
+      padding: 30px;
+    }
+
+    h1 {
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+
+    label {
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    select {
+      padding: 12px; /* Increased padding for larger font */
+      margin-bottom: 15px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 18px; /* Larger font size for input fields */
+    }
+
+    button {
+      background-color: #008CBA; /* Blue */
+      color: white;
+      padding: 14px 22px; /* Increased padding for larger font */
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      font-size: 18px; /* Larger font size for buttons */
+    }
+
+    button:hover {
+      background-color: #006c84;
+    }
+
+    #topics {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start; /* Align labels to the left */
+    }
+
+    #topics input {
+      margin-bottom: 10px;
+    }
+
+    #topics button {
+      align-self: center; /* Center the "Add Topic" button */
+    }
+
+    .output {
+      margin-top: 30px;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Table Styling */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      font-size: 18px; /* Larger font size for the table */
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 15px; /* Increased padding for larger font */
+      text-align: left;
+    }
+
+    th {
+      background-color: #f2f2f2;
+      font-weight: bold;
+    }
+
+    /* Optional: Zebra-striping for table rows */
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+
+    /* Study Plan Output Styling */
+    pre {
+        white-space: pre-wrap; /* Preserve line breaks and spaces */
+        font-family: 'Times New Roman', serif;
+        font-size: 20px; /* Increased font size */
+        line-height: 1.6; /* Adjust line spacing for better readability */
+        
+      }
+  </style>
+  <script>
+    function addTopic() {
+      fetch('/add_topic', {method: 'POST'})
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            const topicsDiv = document.getElementById('topics');
+            const newInput = document.createElement('input');
+            newInput.type = 'text';
+            newInput.name = 'topics';
+            newInput.placeholder = 'Enter topic';
+            topicsDiv.appendChild(newInput);
+            topicsDiv.appendChild(document.createElement('br'));
+          }
+        });
+    }
+  </script>
+</head>
+<body>
+  <div class="container">
+    <h1>AI Study Planner</h1>
+    <form method="POST">
+      <label for="subject">Subject:</label>
+      <input type="text" name="subject" required><br><br>
+
+      <div id="topics">
+        <label for="topics">Topics:</label><br>
+        <input type="text" name="topics" placeholder="Enter topic" required><br>
+      </div>
+      <button type="button" onclick="addTopic()">Add Topic</button><br><br>
+
+      <label for="duration">Duration (days):</label>
+      <input type="number" name="duration" required><br><br>
+
+      <label for="study_style">Study Style:</label>
+      <select name="study_style" required>
+        <option value="Intensive">Intensive</option>
+        <option value="Relaxed">Relaxed</option>
+        <option value="Visual">Visual</option>
+        <option value="Auditory">Auditory</option>
+        <option value="Practical">Practical</option>
+      </select><br><br>
+
+      <button type="submit">Generate Study Plan</button>
+    </form>
+
+    <div class="output">
+      {% if study_plan %}
+        <h2>Study Plan for {{ subject }} ({{ duration }} days, {{ study_style }}):</h2>
+        <pre>{{ study_plan }}</pre>  {% endif %}
+
+      {% if video_links %}
+        <h2>Related YouTube Videos:</h2>
+        {% for topic, videos in video_links.items() %}
+          <h3>{{ topic }}:</h3>
+          {% if videos %}
+            <ul>
+              {% for video in videos %}
+                <li><a href="{{ video.url }}" target="_blank">{{ video.title }}</a></li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p>No related videos found for {{ topic }}.</p>
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+    </div>
+  </div>
+</body>
+</html>
