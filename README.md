@@ -18,7 +18,7 @@ The **AI Study Planner** is a smart study assistant that leverages Google's **Ge
 ## Installation
 ### Prerequisites
 - Python 3.8+
-- Node.js & npm (for frontend)
+- Flask Dependencies and Google Gemini dependencies
 - Google Gemini API Key
 
 ### Steps
